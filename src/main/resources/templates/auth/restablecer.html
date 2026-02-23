@@ -38,26 +38,43 @@
         justify-content: center;
     }
 
-    .login-welcome-side {
-        flex: 1;
-        background-color: var(--brand-green);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    /* Ajuste para que el grupo no se rompa */
+    .input-group {
+        background-color: #eeeeee;
+        border-radius: 5px;
         align-items: center;
-        text-align: center;
-        padding: 40px;
-        position: relative;
-        clip-path: ellipse(100% 100% at 100% 50%);
+        padding-right: 10px;
     }
 
     .form-control {
-        background-color: #eeeeee !important;
+        background-color: transparent !important;
         border: none !important;
-        padding: 12px 15px;
-        margin: 8px 0;
-        border-radius: 5px;
+        padding: 12px 10px;
+        box-shadow: none !important;
+    }
+
+    /* Iconos dentro del input group */
+    .input-group-text {
+        background: transparent !important;
+        border: none !important;
+        color: #666;
+    }
+
+    .toggle-password {
+        cursor: pointer;
+        padding: 0 10px;
+    }
+
+    /* Mensaje de error: Forzado debajo del grupo */
+    label.error,
+    span.text-danger {
+        display: block;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        margin-left: 5px;
+        width: 100%;
+        /* Ocupa toda la línea de abajo */
     }
 
     .btn-brand {
@@ -74,7 +91,19 @@
     .btn-brand:hover {
         background-color: #3e9a85;
         color: white;
-        transform: scale(1.05);
+    }
+
+    .login-welcome-side {
+        flex: 1;
+        background-color: var(--brand-green);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px;
+        clip-path: ellipse(100% 100% at 100% 50%);
     }
 
     @media (max-width: 768px) {
@@ -98,23 +127,25 @@
             <form th:action="@{/auth/restablecer}" method="post" id="resetForm">
                 <input type="hidden" name="token" th:value="${token}">
 
-                <div class="mb-3">
+                <div class="mb-3 control-wrapper">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted">
-                            <i class="fa-solid fa-lock"></i>
-                        </span>
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                         <input type="password" name="password" id="password" class="form-control"
                             placeholder="Nueva contraseña">
+                        <span class="input-group-text toggle-password" data-target="#password">
+                            <i class="fa-solid fa-eye"></i>
+                        </span>
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-4 control-wrapper">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted">
-                            <i class="fa-solid fa-check-double"></i>
-                        </span>
+                        <span class="input-group-text"><i class="fa-solid fa-check-double"></i></span>
                         <input type="password" name="confirm_password" id="confirm_password" class="form-control"
                             placeholder="Confirmar contraseña">
+                        <span class="input-group-text toggle-password" data-target="#confirm_password">
+                            <i class="fa-solid fa-eye"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -126,40 +157,52 @@
 
         <div class="login-welcome-side">
             <h1 class="fw-bold mb-3">Seguridad</h1>
-            <p class="mb-4">Crea una combinación que no utilices en otros sitios para mantener tu cuenta de TEVCOL
-                protegida.</p>
-            <div class="text-center mt-4">
-                <i class="fa-solid fa-shield-halved fa-3x mb-3"></i>
-                <p class="fw-bold">TU CUENTA ESTÁ SEGURA</p>
-            </div>
+            <p class="mb-4">Tu cuenta está casi lista. Usa una contraseña segura.</p>
+            <i class="fa-solid fa-shield-halved fa-4x"></i>
         </div>
     </div>
 
     <script th:inline="javascript">
         $(document).ready(function () {
+
+            // Lógica de los ojitos
+            $('.toggle-password').on('click', function () {
+                const target = $(this).data('target');
+                const input = $(target);
+                const icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Validación corregida
             $("#resetForm").validate({
                 rules: {
-                    password: {
-                        required: true,
-                        minlength: 6
-                    },
-                    confirm_password: {
-                        required: true,
-                        equalTo: "#password"
-                    }
+                    password: { required: true, minlength: 6 },
+                    confirm_password: { required: true, equalTo: "#password" }
                 },
                 messages: {
                     password: {
                         required: "Ingresa una nueva clave",
-                        minlength: "Debe tener al menos 6 caracteres"
+                        minlength: "Mínimo 6 caracteres"
                     },
                     confirm_password: {
                         required: "Repite la clave",
-                        equalTo: "Las contraseñas no coinciden"
+                        equalTo: "Las claves no coinciden"
                     }
                 },
                 errorElement: 'span',
-                errorClass: 'text-danger small mt-1 d-block'
+                errorClass: 'text-danger small',
+                // ESTO ES LO QUE EVITA QUE SE ROMPA EL INPUT GROUP
+                errorPlacement: function (error, element) {
+                    // Coloca el error después del div .input-group, no dentro de él
+                    error.insertAfter(element.closest('.input-group'));
+                }
             });
         });
     </script>

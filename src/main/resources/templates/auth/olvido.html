@@ -29,7 +29,6 @@
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(8px);
         display: none;
-        /* Oculto por defecto */
         flex-direction: column;
         align-items: center;
         justify-content: center;
@@ -64,7 +63,7 @@
 
     @keyframes spinner-d3o04m {
         100% {
-            transform: rotate(1surn);
+            transform: rotate(1turn);
         }
     }
 
@@ -109,12 +108,33 @@
         clip-path: ellipse(100% 100% at 100% 50%);
     }
 
+    /* Ajuste del Input Group para mantener fila única */
+    .input-group {
+        background-color: #eeeeee;
+        border-radius: 5px;
+        align-items: center;
+        display: flex;
+    }
+
     .form-control {
-        background-color: #eeeeee !important;
+        background-color: transparent !important;
         border: none !important;
         padding: 12px 15px;
-        margin: 8px 0;
-        border-radius: 5px;
+        box-shadow: none !important;
+    }
+
+    .input-group-text {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    /* Estilo para el error de validación (Adebajo y alineado) */
+    span.text-danger.small {
+        display: block;
+        width: 100%;
+        margin-top: 5px;
+        margin-left: 45px;
+        /* Alineación con el texto del input */
     }
 
     .btn-brand {
@@ -159,9 +179,9 @@
                 restablecimiento.</p>
 
             <form th:action="@{/auth/olvido}" method="post" id="olvidoForm">
-                <div class="mb-4">
+                <div class="mb-3">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted">
+                        <span class="input-group-text text-muted">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
                         <input type="email" name="email" id="email" class="form-control"
@@ -170,8 +190,9 @@
                 </div>
 
                 <div class="text-center">
-                    <button type="submit" id="btnSubmit" class="btn btn-brand shadow-sm w-100 mb-3">ENVIAR
-                        ENLACE</button>
+                    <button type="submit" id="btnSubmit" class="btn btn-brand shadow-sm w-100 mb-3">
+                        ENVIAR ENLACE
+                    </button>
                     <a th:href="@{/auth/login}" class="text-decoration-underline small text-muted d-block mt-2">
                         Volver al inicio de sesión
                     </a>
@@ -202,17 +223,18 @@
                     }
                 },
                 errorElement: 'span',
-                errorClass: 'text-danger small mt-1 d-block',
+                errorClass: 'text-danger small',
+                // Clave: El error se inserta DESPUÉS del contenedor input-group
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.closest('.input-group'));
+                },
                 submitHandler: function (form) {
-                    // Mostrar el overlay de carga con efecto Flex
                     $("#loader-overlay").css("display", "flex");
-                    // Desactivar el botón para evitar múltiples clics
                     $("#btnSubmit").prop("disabled", true);
                     form.submit();
                 }
             });
 
-            // Toasts de respuesta (seguimos usando Swal para los mensajes finales)
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',

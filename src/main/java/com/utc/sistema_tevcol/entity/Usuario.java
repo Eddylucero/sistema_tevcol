@@ -1,5 +1,7 @@
 package com.utc.sistema_tevcol.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +21,7 @@ public class Usuario {
 
     // Para la recuperación de contraseña
     private String resetToken;
+    private LocalDateTime tokenExpiration;
 
     // Getters y Setters
     public Long getId() {
@@ -59,5 +62,13 @@ public class Usuario {
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
+    }
+    
+    public LocalDateTime getTokenExpiration() {
+        return tokenExpiration;
+    }
+
+    public void setTokenExpiration(LocalDateTime tokenExpiration) {
+        this.tokenExpiration = tokenExpiration;
     }
 }

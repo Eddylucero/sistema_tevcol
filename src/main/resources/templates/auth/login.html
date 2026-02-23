@@ -6,13 +6,11 @@
 <style>
     :root {
         --brand-green: #4db69e;
-        /* El verde de tu imagen */
         --dark-text: #333;
     }
 
     body {
         background-color: #92d9c8;
-        /* Color de fondo de la imagen */
         font-family: 'Segoe UI', sans-serif;
         height: 100vh;
         margin: 0;
@@ -21,7 +19,61 @@
         justify-content: center;
     }
 
-    /* Contenedor principal estilo la imagen */
+    /* Overlay de Carga - MISMA ANIMACIÓN QUE RECUPERAR */
+    #loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        width: 56px;
+        height: 56px;
+        display: grid;
+        border: 4px solid #0000;
+        border-radius: 50%;
+        border-right-color: var(--brand-green);
+        animation: spinner-d3o04m 1s infinite linear;
+    }
+
+    .spinner::before,
+    .spinner::after {
+        content: "";
+        grid-area: 1/1;
+        margin: 2px;
+        border: inherit;
+        border-radius: 50%;
+        animation: spinner-d3o04m 2s infinite;
+    }
+
+    .spinner::after {
+        margin: 8px;
+        animation-duration: 3s;
+    }
+
+    @keyframes spinner-d3o04m {
+        100% {
+            transform: rotate(1turn);
+        }
+    }
+
+    .loader-text {
+        margin-top: 15px;
+        color: var(--dark-text);
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    /* Estructura Card */
     .login-container {
         background: #fff;
         border-radius: 20px;
@@ -33,7 +85,6 @@
         min-height: 500px;
     }
 
-    /* Panel Izquierdo (Formulario) */
     .login-form-side {
         flex: 1;
         padding: 50px;
@@ -42,7 +93,6 @@
         justify-content: center;
     }
 
-    /* Panel Derecho (Bienvenida con curva) */
     .login-welcome-side {
         flex: 1;
         background-color: var(--brand-green);
@@ -54,17 +104,25 @@
         text-align: center;
         padding: 40px;
         position: relative;
-        /* Crear la curva hacia la izquierda */
         clip-path: ellipse(100% 100% at 100% 50%);
     }
 
-    /* Estilos de Inputs como la imagen */
     .form-control {
         background-color: #eeeeee !important;
         border: none !important;
         padding: 12px 15px;
-        margin: 8px 0;
-        border-radius: 5px;
+        border-radius: 5px !important;
+    }
+
+    span.text-danger.small {
+        display: block;
+        width: 100%;
+        margin-top: 5px;
+        margin-left: 45px;
+    }
+
+    .input-group-text {
+        cursor: pointer;
     }
 
     .btn-brand {
@@ -84,20 +142,6 @@
         transform: scale(1.05);
     }
 
-    .social-icons i {
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0 5px;
-        height: 40px;
-        width: 40px;
-        color: var(--dark-text);
-        cursor: pointer;
-    }
-
-    /* Ajuste para móviles */
     @media (max-width: 768px) {
         .login-welcome-side {
             display: none;
@@ -111,37 +155,47 @@
 
 <body>
 
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <div class="loader-text">VERIFICANDO CREDENCIALES...</div>
+    </div>
+
     <div class="login-container mx-3">
         <div class="login-form-side">
-            <h2 class="fw-bold mb-3 text-center">Iniciar Sesión</h2>           
-
+            <h2 class="fw-bold mb-3 text-center">Iniciar Sesión</h2>
             <p class="text-muted small text-center mb-4">Use su correo y contraseña</p>
 
             <form th:action="@{/auth/login}" method="post" id="loginForm">
                 <div class="mb-3">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted"><i
-                                class="fa-solid fa-envelope"></i></span>
+                        <span class="input-group-text bg-transparent border-0 text-muted">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
                         <input type="email" name="username" id="username" class="form-control" placeholder="Email">
                     </div>
                 </div>
 
                 <div class="mb-2">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted"><i
-                                class="fa-solid fa-lock"></i></span>
+                        <span class="input-group-text bg-transparent border-0 text-muted">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
                         <input type="password" name="password" id="password" class="form-control"
                             placeholder="Password">
+                        <span class="input-group-text bg-transparent border-0 text-muted" id="togglePassword">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </span>
                     </div>
                 </div>
 
                 <div class="text-center mb-4">
-                    <a th:href="@{/auth/olvido}" class="text-decoration-underline small text-muted">¿Olvidaste tu
-                        contraseña?</a>
+                    <a th:href="@{/auth/olvido}" class="text-decoration-underline small text-muted">
+                        ¿Olvidaste tu contraseña?
+                    </a>
                 </div>
 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-brand shadow-sm">INICIAR SESIÓN</button>
+                    <button type="submit" id="btnSubmit" class="btn btn-brand shadow-sm w-100">INICIAR SESIÓN</button>
                 </div>
             </form>
         </div>
@@ -158,6 +212,17 @@
 
     <script th:inline="javascript">
         $(document).ready(function () {
+
+            // 1. Ver/Ocultar contraseña
+            $('#togglePassword').on('click', function () {
+                const passwordField = $('#password');
+                const eyeIcon = $('#eyeIcon');
+                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+                passwordField.attr('type', type);
+                eyeIcon.toggleClass('fa-eye fa-eye-slash');
+            });
+
+            // 2. Validación JQuery con animación al éxito
             $("#loginForm").validate({
                 rules: {
                     username: { required: true, email: true },
@@ -173,29 +238,43 @@
                     }
                 },
                 errorElement: 'span',
-                errorClass: 'text-danger small'
+                errorClass: 'text-danger small',
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.closest('.input-group'));
+                },
+                // AQUÍ SE ACTIVA EL LOADER AL ENVIAR
+                submitHandler: function (form) {
+                    $("#loader-overlay").css("display", "flex");
+                    $("#btnSubmit").prop("disabled", true);
+                    form.submit();
+                }
             });
 
+            // 3. Toasts
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 4000,
                 timerProgressBar: true
             });
 
             const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.has('tokenExpirado')) {
+                Toast.fire({ icon: 'error', title: 'Enlace expirado', text: 'El enlace de recuperación solo es válido por 5 minutos.' });
+            }
             if (urlParams.has('errorEmail')) {
-                Toast.fire({ icon: 'error', title: 'Correo incorrecto', text: 'El usuario no existe en el sistema.' });
+                Toast.fire({ icon: 'error', title: 'Correo incorrecto', text: 'El usuario no existe.' });
             }
             if (urlParams.has('errorPass')) {
-                Toast.fire({ icon: 'warning', title: 'Contraseña incorrecta', text: 'La clave ingresada no es válida.' });
+                Toast.fire({ icon: 'warning', title: 'Contraseña incorrecta', text: 'La clave no es válida.' });
             }
             if (urlParams.has('logout')) {
                 Toast.fire({ icon: 'info', title: 'Sesión cerrada' });
             }
             if (urlParams.has('resetSuccess')) {
-                Toast.fire({ icon: 'success', title: '¡Clave actualizada!' });
+                Toast.fire({ icon: 'success', title: 'Clave actualizada', text: 'Ya puedes iniciar sesión con tu nueva contraseña.' });
             }
         });
     </script>
