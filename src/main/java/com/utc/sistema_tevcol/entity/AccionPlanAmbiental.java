@@ -2,7 +2,6 @@ package com.utc.sistema_tevcol.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -32,7 +31,7 @@ public class AccionPlanAmbiental {
     private Integer denominadorValorAccion;
 
     @Column(name = "estado_aplica")
-    private Integer estadoAplica = 1;
+    private Integer estadoAplica;
 
     @Column(name = "color_accion", length = 25)
     private String colorAccion;
@@ -55,10 +54,23 @@ public class AccionPlanAmbiental {
     @Column(name = "fecha_editado_accion")
     private LocalDateTime fechaEditadoAccion;
 
-    @OneToMany(mappedBy = "accion", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "accion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ActividadAccion> actividades;
 
     public AccionPlanAmbiental() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreadoAccion = LocalDateTime.now();
+        if (this.estadoAplica == null) {
+            this.estadoAplica = 1;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.fechaEditadoAccion = LocalDateTime.now();
     }
 
     // Getters y Setters

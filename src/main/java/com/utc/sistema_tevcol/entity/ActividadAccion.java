@@ -2,7 +2,6 @@ package com.utc.sistema_tevcol.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -23,10 +22,7 @@ public class ActividadAccion {
     private LocalDate fechaMaxActividad;
 
     @Column(name = "estado_actividad")
-    private String estadoActividad = "ABIERTO";
-
-    @Column(name = "fk_cod_accion", insertable = false, updatable = false)
-    private Long fkCodAccion;
+    private String estadoActividad;
 
     @Column(name = "fecha_creado_actividad", updatable = false)
     private LocalDateTime fechaCreadoActividad;
@@ -34,11 +30,24 @@ public class ActividadAccion {
     @Column(name = "fecha_editado_actividad")
     private LocalDateTime fechaEditadoActividad;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "fk_cod_accion", referencedColumnName = "codigo_accion")
     private AccionPlanAmbiental accion;
 
     public ActividadAccion() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreadoActividad = LocalDateTime.now();
+        if (this.estadoActividad == null) {
+            this.estadoActividad = "ABIERTO";
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.fechaEditadoActividad = LocalDateTime.now();
     }
 
     // Getters y Setters

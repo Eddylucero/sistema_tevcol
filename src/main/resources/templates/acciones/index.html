@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/base :: head('Acciones')"></head>
+
+<body>
+
+    <div th:replace="layout/base :: menu"></div>
+
+    <div class="container mt-4">
+
+        <div th:if="${success}">
+            <script th:inline="javascript">
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: [[${ success }]]
+                });
+            </script>
+        </div>
+
+        <div class="mb-3 text-end">
+            <a th:href="@{/accion/nuevo}" class="btn btn-outline-primary">
+                <i class="fa-solid fa-plus"></i> Nueva Acción
+            </a>
+        </div>
+
+        <h2 class="text-center mb-4">Listado de Acciones</h2>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <table id="tablaAcciones" class="table table-bordered table-hover text-center align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Aspecto Ambiental</th>
+                            <th>Impacto Ambiental</th>
+                            <th>Estado</th>
+                            <th>Frecuencia</th>
+                            <th>Periodo</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="a : ${acciones}">
+                            <td th:text="${a.codigoAccion}"></td>
+                            <td th:text="${a.aspectoAmbientalAccion}"></td>
+                            <td th:text="${a.impactoAmbientalAccion}"></td>
+                            <td th:text="${a.estadoAplica}"></td>
+                            <td th:text="${a.frecuenciaAccion}"></td>
+                            <td th:text="${a.periodoAccion}"></td>
+                            <td>
+                                <a th:href="@{/accion/editar/{id}(id=${a.codigoAccion})}"
+                                    class="btn btn-outline-warning btn-sm">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+
+                                <button class="btn btn-outline-danger btn-sm"
+                                    th:onclick="|eliminarAccion(${a.codigoAccion})|">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="layout/base :: footer"></div>
+
+    <script th:inline="javascript">
+        const eliminarAccionUrl = [[@{/ accion / eliminar /}]];
+
+        function eliminarAccion(id) {
+            Swal.fire({
+                title: '¿Eliminar acción?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = eliminarAccionUrl + id;
+                }
+            });
+        }
+    </script>
+
+    <script th:inline="javascript">
+        $(function () {
+            $('#tablaAcciones').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
