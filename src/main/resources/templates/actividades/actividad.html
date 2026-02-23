@@ -132,75 +132,109 @@
 
     <script>
         $(function () {
+                // 1. Métodos personalizados
+                $.validator.addMethod("fechaNoAnteriorHoy", function (value, element) {
+                    if ($('#esEdicion').val() === 'true') return true;
+                    if (!value) return true;
+                    const fechaIngresada = new Date(value + "T00:00:00");
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    return fechaIngresada >= hoy;
+                });
 
-            $.validator.addMethod("fechaNoAnteriorHoy", function (value, element) {
-                if ($('#esEdicion').val() === 'true') return true;
-                if (!value) return true;
+                $.validator.addMethod("fechaMaximaValida", function (value, element) {
+                    const fechaInicio = $("#fechaIniActividad").val();
+                    if (!value || !fechaInicio) return true;
+                    const fechaMax = new Date(value + "T00:00:00");
+                    const fechaIni = new Date(fechaInicio + "T00:00:00");
+                    fechaMax.setHours(0, 0, 0, 0);
+                    fechaIni.setHours(0, 0, 0, 0);
+                    return fechaMax >= fechaIni;
+                });
 
-                const fechaIngresada = new Date(value + "T00:00:00");
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                return fechaIngresada >= hoy;
-            });
-
-            $.validator.addMethod("fechaMaximaValida", function (value, element) {
-                const fechaInicio = $("#fechaIniActividad").val();
-                if (!value || !fechaInicio) return true;
-
-                const fechaMax = new Date(value + "T00:00:00");
-                const fechaIni = new Date(fechaInicio + "T00:00:00");
-
-                fechaMax.setHours(0, 0, 0, 0);
-                fechaIni.setHours(0, 0, 0, 0);
-
-                return fechaMax >= fechaIni;
-            });
-
-            $("#actividadForm").validate({
-                rules: {
-                    numeroActividad: {
-                        required: true,
-                        digits: true,
-                        min: 1
+                // 2. Configuración de validación
+                $("#actividadForm").validate({
+                    rules: {
+                        numeroActividad: {
+                            required: true,
+                            digits: true,
+                            min: 1
+                        },
+                        fechaIniActividad: {
+                            required: true,
+                            date: true,
+                            fechaNoAnteriorHoy: true
+                        },
+                        fechaMaxActividad: {
+                            required: true,
+                            date: true,
+                            fechaMaximaValida: true
+                        },
+                        estadoActividad: {
+                            required: true
+                        },
+                        "accion.codigoAccion": {
+                            required: true
+                        }
                     },
-                    fechaIniActividad: {
-                        required: true,
-                        date: true,
-                        fechaNoAnteriorHoy: true
+                    messages: {
+                        numeroActividad: {
+                            required: "Por favor, ingrese el número de actividad.",
+                            digits: "Solo se permiten números enteros.",
+                            min: "El número debe ser mayor a 0."
+                        },
+                        fechaIniActividad: {
+                            required: "La fecha de inicio es obligatoria.",
+                            date: "Ingrese una fecha válida.",
+                            fechaNoAnteriorHoy: "La fecha no puede ser anterior a hoy."
+                        },
+                        fechaMaxActividad: {
+                            required: "La fecha máxima es obligatoria.",
+                            date: "Ingrese una fecha válida.",
+                            fechaMaximaValida: "La fecha máxima no puede ser menor a la fecha de inicio."
+                        },
+                        estadoActividad: {
+                            required: "Debe seleccionar un estado para la actividad."
+                        },
+                        "accion.codigoAccion": {
+                            required: "Debe seleccionar una acción vinculada."
+                        }
                     },
-                    fechaMaxActividad: {
-                        required: true,
-                        date: true,
-                        fechaMaximaValida: true
+                    // Estilo de los mensajes
+                    errorClass: "error",
+                    validClass: "valid",
+                    errorElement: "label",
+
+                    // Resaltado de campos con Bootstrap
+                    highlight: function (element) {
+                        $(element).addClass('is-invalid').removeClass('is-valid');
                     },
-                    estadoActividad: {
-                        required: true
+                    unhighlight: function (element) {
+                        $(element).addClass('is-valid').removeClass('is-invalid');
                     },
-                    "accion.codigoAccion": {
-                        required: true
+
+                    onfocusout: function (element) {
+                        $(element).valid();
+                        if (element.id === 'fechaIniActividad') {
+                            $('#fechaMaxActividad').valid();
+                        }
+                    },
+                    submitHandler: function (form) {
+                        Swal.fire({
+                            title: 'Guardando actividad...',
+                            text: 'Por favor espere',
+                            allowOutsideClick: false,
+                            didOpen: () => { Swal.showLoading(); }
+                        });
+                        $('button[type="submit"]').prop('disabled', true);
+                        form.submit();
                     }
-                },
-                errorClass: "error",
-                validClass: "valid",
-                errorElement: "label",
-                onfocusout: function (element) {
-                    $(element).valid();
-                    if (element.id === 'fechaIniActividad') {
-                        $('#fechaMaxActividad').valid();
-                    }
-                },
-                submitHandler: function (form) {
-                    $('button[type="submit"]').prop('disabled', true);
-                    form.submit();
-                }
-            });
+                });
 
-            $('#fechaIniActividad').on('change', function () {
-                $('#fechaMaxActividad').valid();
+                $('#fechaIniActividad').on('change', function () {
+                    $('#fechaMaxActividad').valid();
+                });
             });
-
-        });
     </script>
 
 </body>

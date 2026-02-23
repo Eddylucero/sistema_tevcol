@@ -103,57 +103,105 @@
     <style>
         label.error {
             color: #dc3545;
-            font-size: 0.875rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-top: 5px;
+            display: block;
         }
-
-        input.error,
-        select.error,
+    
+        /* Bordes de validación */
+        .form-control.error,
+        .form-select.error,
         textarea.error {
-            border-color: #dc3545;
+            border-color: #dc3545 !important;
         }
-
-        input.valid,
-        select.valid,
+    
+        .form-control.valid,
+        .form-select.valid,
         textarea.valid {
-            border-color: #198754;
+            border-color: #198754 !important;
+        }
+    
+        /* Estilo para los textareas */
+        textarea.form-control {
+            resize: none;
+            /* Evita que el usuario deforme el diseño */
+        }
+    
+        .card {
+            border-radius: 12px;
+            border: none;
         }
     </style>
-
+    
     <script>
         $(function () {
-
             $("#accionForm").validate({
                 rules: {
-                    aspectoAmbientalAccion: {
-                        required: true
+                    aspectoAmbientalAccion: { required: true },
+                    impactoAmbientalAccion: { required: true },
+                    medidasPropuestasAccion: { required: true },
+                    indicadorPlaceholderAccion: { required: true },
+                    numeradorValorAccion: {
+                        required: true,
+                        number: true,
+                        min: 0
                     },
-                    impactoAmbientalAccion: {
-                        required: true
+                    denominadorValorAccion: {
+                        required: true,
+                        number: true,
+                        min: 1
                     },
-                    estadoAplica: {
-                        required: true
-                    }
+                    frecuenciaAccion: {
+                        required: true,
+                        digits: true,
+                        min: 1
+                    },
+                    periodoAccion: { required: true },
+                    estadoAplica: { required: true }
                 },
                 messages: {
-                    aspectoAmbientalAccion: {
-                        required: "El aspecto ambiental es obligatorio"
+                    aspectoAmbientalAccion: { required: "El aspecto ambiental es requerido." },
+                    impactoAmbientalAccion: { required: "El impacto ambiental es requerido." },
+                    medidasPropuestasAccion: { required: "Las medidas propuestas son requeridas." },
+                    indicadorPlaceholderAccion: { required: "El nombre del indicador es requerido." },
+                    numeradorValorAccion: {
+                        required: "El numerador es requerido.",
+                        number: "Ingrese un valor numérico.",
+                        min: "El valor no puede ser negativo."
                     },
-                    impactoAmbientalAccion: {
-                        required: "El impacto ambiental es obligatorio"
+                    denominadorValorAccion: {
+                        required: "El denominador es requerido.",
+                        number: "Ingrese un valor numérico.",
+                        min: "El denominador debe ser al menos 1."
                     },
-                    estadoAplica: {
-                        required: "Debe seleccionar el estado"
-                    }
+                    frecuenciaAccion: {
+                        required: "La frecuencia es requerida.",
+                        digits: "Solo se permiten números enteros.",
+                        min: "La frecuencia mínima es 1."
+                    },
+                    periodoAccion: { required: "El periodo es requerido (ej: Mensual, Anual)." },
+                    estadoAplica: { required: "Debe seleccionar un estado." }
                 },
                 errorClass: "error",
                 validClass: "valid",
                 errorElement: "label",
+
+                // Resaltado visual para que se vea pro con Bootstrap
+                highlight: function (element) {
+                    $(element).addClass('is-invalid').removeClass('is-valid');
+                },
+                unhighlight: function (element) {
+                    $(element).addClass('is-valid').removeClass('is-invalid');
+                },
+
                 submitHandler: function (form) {
+                    // Bloqueamos el botón para evitar doble envío
+                    $('button[type="submit"]').html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
                     $('button[type="submit"]').prop('disabled', true);
                     form.submit();
                 }
             });
-
         });
     </script>
 

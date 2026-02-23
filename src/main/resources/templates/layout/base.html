@@ -20,24 +20,55 @@
     <style>
         body {
             overflow-x: hidden;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
-            width: 250px;
+            width: 260px;
             min-height: 100vh;
+            background: linear-gradient(180deg, #198754 0%, #145a32 100%);
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
         }
 
         .sidebar .nav-link {
-            color: #ffffff;
-            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 14px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
         }
 
         .sidebar .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.1rem;
+            width: 25px;
         }
 
         .content-wrapper {
             flex-grow: 1;
+            background-color: #f8f9fa;
+        }
+
+        .user-panel {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -45,44 +76,46 @@
 <body class="bg-light">
 
     <div class="d-flex">
+        <nav th:fragment="menu" class="sidebar text-white p-2">
+            <div class="p-3 mb-4">
+                <h4 class="text-center fw-bold mb-0">
+                    <i class="fa-solid fa-leaf me-2"></i>TEVCOL
+                </h4>
+                <p class="text-center small opacity-75 mb-0">Gestión Ambiental</p>
+            </div>
 
-        <nav th:fragment="menu" class="sidebar bg-success text-white p-3">
-            <h4 class="text-center fw-bold mb-4">
-                <i class="fa-solid fa-leaf"></i> TEVCOL
-            </h4>
-
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a class="nav-link text-white" th:href="@{/}">
-                        <i class="fa-solid fa-home me-2"></i> Dashboard
+            <ul class="nav nav-pills flex-column mb-auto">                
+                <li>
+                    <a class="nav-link" th:href="@{/accion}"
+                        th:classappend="${#execInfo.templateName.contains('accion') ? 'active' : ''}">
+                        <i class="fa-solid fa-list-check"></i> Acciones
                     </a>
                 </li>
                 <li>
-                    <a class="nav-link text-white" th:href="@{/accion}">
-                        <i class="fa-solid fa-list-check me-2"></i> Acciones
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link text-white" th:href="@{/actividad}">
-                        <i class="fa-solid fa-tasks me-2"></i> Actividades
+                    <a class="nav-link" th:href="@{/actividad}"
+                        th:classappend="${#execInfo.templateName.contains('actividad') ? 'active' : ''}">
+                        <i class="fa-solid fa-tasks"></i> Actividades
                     </a>
                 </li>
             </ul>
 
-            <hr class="text-white">
+            <hr class="mx-3 opacity-25">
 
-            <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="user-panel mx-2">
                 <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-2"
                         data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-user-circle me-2"></i>
-                        <strong th:text="${#authentication.name}">Usuario</strong>
+                        <i class="fa-solid fa-circle-user fa-2x me-2 text-info"></i>
+                        <div class="overflow-hidden">
+                            <p class="mb-0 small fw-bold text-truncate" th:text="${#authentication.name}">Usuario</p>
+                            <span class="badge bg-light text-dark" style="font-size: 0.6rem;">ADMIN</span>
+                        </div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0">
                         <li>
-                            <form th:action="@{/auth/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="fa-solid fa-sign-out-alt me-2"></i> Cerrar Sesión
+                            <form th:action="@{/auth/logout}" method="post" id="logoutForm">
+                                <button type="submit" class="dropdown-item py-2">
+                                    <i class="fa-solid fa-power-off me-2 text-danger"></i> Cerrar Sesión
                                 </button>
                             </form>
                         </li>
@@ -94,14 +127,13 @@
         <div class="content-wrapper p-4 w-100">
             <div th:replace="${contenido}"></div>
 
-            <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm">
-                <div class="container text-center">
-                    <h6 class="mb-0"><b>Desarrollado por:</b> Eddy Lucero</h6>
+            <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm rounded-3">
+                <div class="container text-center text-muted">
+                    <h6 class="mb-0 small text-dark"><b>Desarrollado por:</b> Eddy Lucero</h6>
                     <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
                 </div>
             </footer>
         </div>
-
     </div>
 
     <script th:inline="javascript">
@@ -111,9 +143,9 @@
                 Swal.fire({
                     icon: 'success',
                     title: '¡Bienvenido al Sistema!',
-                    text: 'Sesión iniciada correctamente como Administrador',
+                    text: 'Sesión iniciada correctamente',
                     confirmButtonColor: '#198754',
-                    timer: 3000,
+                    timer: 2500,
                     timerProgressBar: true
                 });
                 const cleanUrl = window.location.origin + window.location.pathname;
@@ -121,7 +153,6 @@
             }
         });
     </script>
-
 </body>
 
 </html>
