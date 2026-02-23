@@ -3,40 +3,161 @@
 
 <head th:replace="~{layout/base :: head('Login')}"></head>
 
-<body class="bg-dark d-flex align-items-center" style="height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow-lg border-0">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4 text-success"><i class="fa-solid fa-leaf"></i> TEVCOL</h3>
+<style>
+    :root {
+        --brand-green: #4db69e;
+        /* El verde de tu imagen */
+        --dark-text: #333;
+    }
 
-                        <form th:action="@{/auth/login}" method="post" id="loginForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Email</label>
-                                <input type="email" name="username" id="username" class="form-control"
-                                    placeholder="ejemplo@correo.com">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Contraseña</label>
-                                <input type="password" name="password" id="password" class="form-control"
-                                    placeholder="******">
-                            </div>
-                            <button type="submit" class="btn btn-success w-100 mb-3 fw-bold">Entrar</button>
-                            <div class="text-center">
-                                <a th:href="@{/auth/olvido}" class="text-decoration-none small text-muted">¿Olvidaste tu
-                                    contraseña?</a>
-                            </div>
-                        </form>
+    body {
+        background-color: #92d9c8;
+        /* Color de fondo de la imagen */
+        font-family: 'Segoe UI', sans-serif;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Contenedor principal estilo la imagen */
+    .login-container {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        min-height: 500px;
+    }
+
+    /* Panel Izquierdo (Formulario) */
+    .login-form-side {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Panel Derecho (Bienvenida con curva) */
+    .login-welcome-side {
+        flex: 1;
+        background-color: var(--brand-green);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px;
+        position: relative;
+        /* Crear la curva hacia la izquierda */
+        clip-path: ellipse(100% 100% at 100% 50%);
+    }
+
+    /* Estilos de Inputs como la imagen */
+    .form-control {
+        background-color: #eeeeee !important;
+        border: none !important;
+        padding: 12px 15px;
+        margin: 8px 0;
+        border-radius: 5px;
+    }
+
+    .btn-brand {
+        background-color: var(--brand-green);
+        color: white;
+        border: none;
+        padding: 12px 45px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .btn-brand:hover {
+        background-color: #3e9a85;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .social-icons i {
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 5px;
+        height: 40px;
+        width: 40px;
+        color: var(--dark-text);
+        cursor: pointer;
+    }
+
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .login-welcome-side {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+        }
+    }
+</style>
+
+<body>
+
+    <div class="login-container mx-3">
+        <div class="login-form-side">
+            <h2 class="fw-bold mb-3 text-center">Iniciar Sesión</h2>           
+
+            <p class="text-muted small text-center mb-4">Use su correo y contraseña</p>
+
+            <form th:action="@{/auth/login}" method="post" id="loginForm">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-muted"><i
+                                class="fa-solid fa-envelope"></i></span>
+                        <input type="email" name="username" id="username" class="form-control" placeholder="Email">
                     </div>
                 </div>
+
+                <div class="mb-2">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-muted"><i
+                                class="fa-solid fa-lock"></i></span>
+                        <input type="password" name="password" id="password" class="form-control"
+                            placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <a th:href="@{/auth/olvido}" class="text-decoration-underline small text-muted">¿Olvidaste tu
+                        contraseña?</a>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-brand shadow-sm">INICIAR SESIÓN</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-welcome-side">
+            <h1 class="fw-bold mb-3">¡Bienvenido!</h1>
+            <p class="mb-4">Ingrese sus datos personales para usar todas las funciones del sitio</p>
+            <div class="text-center mt-4">
+                <i class="fa-solid fa-leaf fa-3x mb-3"></i>
+                <p class="fw-bold">TEVCOL</p>
             </div>
         </div>
     </div>
 
     <script th:inline="javascript">
         $(document).ready(function () {
-            // 1. VALIDACIÓN CON JQUERY VALIDATE
             $("#loginForm").validate({
                 rules: {
                     username: { required: true, email: true },
@@ -55,7 +176,6 @@
                 errorClass: 'text-danger small'
             });
 
-            // 2. CONFIGURACIÓN DE TOASTS CON SWEETALERT2
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -65,7 +185,6 @@
             });
 
             const urlParams = new URLSearchParams(window.location.search);
-
             if (urlParams.has('errorEmail')) {
                 Toast.fire({ icon: 'error', title: 'Correo incorrecto', text: 'El usuario no existe en el sistema.' });
             }

@@ -1,24 +1,168 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="layout/base :: head('Nueva Clave')"></head>
+<head th:replace="~{layout/base :: head('Nueva Clave')}"></head>
 
-<body class="bg-light d-flex align-items-center" style="height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4 card p-4 shadow">
-                <h4 class="text-center">Nueva Contraseña</h4>
-                <form th:action="@{/auth/restablecer}" method="post">
-                    <input type="hidden" name="token" th:value="${token}">
-                    <div class="mb-3">
-                        <label>Nueva contraseña:</label>
-                        <input type="password" name="password" class="form-control" id="pass" required minlength="6">
+<style>
+    :root {
+        --brand-green: #4db69e;
+        --dark-text: #333;
+    }
+
+    body {
+        background-color: #92d9c8;
+        font-family: 'Segoe UI', sans-serif;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-container {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        min-height: 500px;
+    }
+
+    .login-form-side {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-welcome-side {
+        flex: 1;
+        background-color: var(--brand-green);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px;
+        position: relative;
+        clip-path: ellipse(100% 100% at 100% 50%);
+    }
+
+    .form-control {
+        background-color: #eeeeee !important;
+        border: none !important;
+        padding: 12px 15px;
+        margin: 8px 0;
+        border-radius: 5px;
+    }
+
+    .btn-brand {
+        background-color: var(--brand-green);
+        color: white;
+        border: none;
+        padding: 12px 45px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .btn-brand:hover {
+        background-color: #3e9a85;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .login-welcome-side {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+        }
+    }
+</style>
+
+<body>
+
+    <div class="login-container mx-3">
+        <div class="login-form-side">
+            <h2 class="fw-bold mb-3 text-center">Nueva Clave</h2>
+            <p class="text-muted small text-center mb-4">Establece tu nueva contraseña de acceso.</p>
+
+            <form th:action="@{/auth/restablecer}" method="post" id="resetForm">
+                <input type="hidden" name="token" th:value="${token}">
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-muted">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" name="password" id="password" class="form-control"
+                            placeholder="Nueva contraseña">
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Cambiar Contraseña</button>
-                </form>
+                </div>
+
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-muted">
+                            <i class="fa-solid fa-check-double"></i>
+                        </span>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
+                            placeholder="Confirmar contraseña">
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-brand shadow-sm w-100">ACTUALIZAR CLAVE</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-welcome-side">
+            <h1 class="fw-bold mb-3">Seguridad</h1>
+            <p class="mb-4">Crea una combinación que no utilices en otros sitios para mantener tu cuenta de TEVCOL
+                protegida.</p>
+            <div class="text-center mt-4">
+                <i class="fa-solid fa-shield-halved fa-3x mb-3"></i>
+                <p class="fw-bold">TU CUENTA ESTÁ SEGURA</p>
             </div>
         </div>
     </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $("#resetForm").validate({
+                rules: {
+                    password: {
+                        required: true,
+                        minlength: 6
+                    },
+                    confirm_password: {
+                        required: true,
+                        equalTo: "#password"
+                    }
+                },
+                messages: {
+                    password: {
+                        required: "Ingresa una nueva clave",
+                        minlength: "Debe tener al menos 6 caracteres"
+                    },
+                    confirm_password: {
+                        required: "Repite la clave",
+                        equalTo: "Las contraseñas no coinciden"
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'text-danger small mt-1 d-block'
+            });
+        });
+    </script>
 </body>
 
 </html>
