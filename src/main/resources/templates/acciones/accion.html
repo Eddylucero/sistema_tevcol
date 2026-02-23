@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/base :: head('Acción')"></head>
+
+<style>
+    label.error {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+
+    input.error,
+    select.error,
+    textarea.error {
+        border-color: #dc3545;
+    }
+
+    input.valid,
+    select.valid,
+    textarea.valid {
+        border-color: #198754;
+    }
+</style>
+
+<body>
+
+<div th:replace="layout/base :: menu"></div>
+
+<h2 class="mb-3 text-center"
+    th:text="${accion.codigoAccion == null ? 'Agregar Acción' : 'Editar Acción'}">
+</h2>
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-body">
+
+            <form id="accionForm"
+                  th:action="@{/accion/guardar}"
+                  th:object="${accion}"
+                  method="post">
+
+                <!-- ID oculto (AUTO_INCREMENT) -->
+                <input type="hidden" th:field="*{codigoAccion}" />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Aspecto Ambiental</label>
+                        <textarea th:field="*{aspectoAmbientalAccion}"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Impacto Ambiental</label>
+                        <textarea th:field="*{impactoAmbientalAccion}"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Medidas Propuestas</label>
+                        <textarea th:field="*{medidasPropuestasAccion}"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Indicador</label>
+                        <input type="text"
+                               th:field="*{indicadorPlaceholderAccion}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Numerador</label>
+                        <input type="number"
+                               th:field="*{numeradorValorAccion}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Denominador</label>
+                        <input type="number"
+                               th:field="*{denominadorValorAccion}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Frecuencia</label>
+                        <input type="number"
+                               th:field="*{frecuenciaAccion}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Periodo</label>
+                        <input type="text"
+                               th:field="*{periodoAccion}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Estado</label>
+                        <select th:field="*{estadoAplica}"
+                                class="form-select">
+                            <option value="">Seleccione</option>
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="text-end">
+                    <a th:href="@{/accion}"
+                       class="btn btn-outline-danger me-2">
+                        <i class="fa-solid fa-left-long"></i> Volver
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-outline-success">
+                        Guardar <i class="fa-regular fa-floppy-disk"></i>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="layout/base :: footer"></div>
+
+<script>
+    $(function () {
+
+        $("#accionForm").validate({
+            rules: {
+                aspectoAmbientalAccion: {
+                    required: true
+                },
+                impactoAmbientalAccion: {
+                    required: true
+                },
+                estadoAplica: {
+                    required: true
+                }
+            },
+            messages: {
+                aspectoAmbientalAccion: {
+                    required: "El aspecto ambiental es obligatorio"
+                },
+                impactoAmbientalAccion: {
+                    required: "El impacto ambiental es obligatorio"
+                },
+                estadoAplica: {
+                    required: "Debe seleccionar el estado"
+                }
+            },
+            errorClass: "error",
+            validClass: "valid",
+            errorElement: "label",
+            submitHandler: function (form) {
+                $('button[type="submit"]').prop('disabled', true);
+                form.submit();
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
