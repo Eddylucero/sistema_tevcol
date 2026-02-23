@@ -3,133 +3,135 @@
 
 <head th:replace="layout/base :: head('Actividad')"></head>
 
-<style>
-    label.error {
-        color: #dc3545;
-        font-size: 0.875rem;
-    }
-
-    input.error,
-    select.error {
-        border-color: #dc3545;
-    }
-
-    input.valid,
-    select.valid {
-        border-color: #198754;
-    }
-
-    .sugerencia-numero {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-
-    .sugerencia-numero i {
-        margin-right: 0.25rem;
-    }
-
-    .fecha-error {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-</style>
-
 <body>
 
-    <div th:replace="layout/base :: menu"></div>
+    <div class="d-flex">
 
-    <h2 class="mb-3 text-center"
-        th:text="${actividad.codigoActividad == null ? 'Agregar Actividad' : 'Editar Actividad'}">
-    </h2>
+        <div th:replace="layout/base :: menu"></div>
 
-    <div class="container mt-4">
-        <div class="card shadow mb-4">
-            <div class="card-body">
+        <div class="content-wrapper p-4 w-100">
 
-                <form id="actividadForm" th:action="@{/actividad/guardar}" th:object="${actividad}" method="post">
-                    <input type="hidden" th:field="*{codigoActividad}" />
+            <h2 class="mb-3 text-center"
+                th:text="${actividad.codigoActividad == null ? 'Agregar Actividad' : 'Editar Actividad'}">
+            </h2>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label>Número de Actividad</label>
-                            <input readonly type="number" th:field="*{numeroActividad}" class="form-control"
-                                id="numeroActividad">
-                            <div th:if="${actividad.codigoActividad == null}" class="sugerencia-numero">
-                                <i class="fa-regular fa-lightbulb"></i>
-                                Sugerencia: Último número registrado es <span th:text="${ultimoNumero}"></span>
-                                <span th:if="${ultimoNumero != null && ultimoNumero > 0}">, se sugiere usar <strong
-                                        th:text="${ultimoNumero + 1}"></strong></span>
-                                <span th:if="${ultimoNumero == null || ultimoNumero == 0}">, se sugiere usar
-                                    <strong>1</strong></span>
+            <div class="container mt-4">
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+
+                        <form id="actividadForm" th:action="@{/actividad/guardar}" th:object="${actividad}"
+                            method="post">
+                            <input type="hidden" th:field="*{codigoActividad}" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Número de Actividad</label>
+                                    <input readonly type="number" th:field="*{numeroActividad}" class="form-control"
+                                        id="numeroActividad">
+                                    <div th:if="${actividad.codigoActividad == null}" class="sugerencia-numero">
+                                        <i class="fa-regular fa-lightbulb"></i>
+                                        Sugerencia: Último número registrado es <span th:text="${ultimoNumero}"></span>
+                                        <span th:if="${ultimoNumero != null && ultimoNumero > 0}">
+                                            , se sugiere usar <strong th:text="${ultimoNumero + 1}"></strong>
+                                        </span>
+                                        <span th:if="${ultimoNumero == null || ultimoNumero == 0}">
+                                            , se sugiere usar <strong>1</strong>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label>Fecha Inicio</label>
+                                    <input type="date" th:field="*{fechaIniActividad}" class="form-control"
+                                        id="fechaIniActividad">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label>Fecha Máxima</label>
+                                    <input type="date" th:field="*{fechaMaxActividad}" class="form-control"
+                                        id="fechaMaxActividad">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label>Estado</label>
+                                    <select th:field="*{estadoActividad}" class="form-select">
+                                        <option value="">Seleccione</option>
+                                        <option value="ABIERTO">ABIERTO</option>
+                                        <option value="EN_PROCESO">EN PROCESO</option>
+                                        <option value="CERRADO">CERRADO</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label>Acción</label>
+                                    <select th:field="*{accion.codigoAccion}" class="form-select" id="accionId">
+                                        <option value="">Seleccione acción</option>
+                                        <option th:each="a : ${acciones}" th:value="${a.codigoAccion}"
+                                            th:text="'ID: ' + ${a.codigoAccion} + ' - ' + ${a.aspectoAmbientalAccion}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <input type="hidden" id="esEdicion" th:value="${actividad.codigoActividad != null}">
                             </div>
-                        </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Fecha Inicio</label>
-                            <input type="date" th:field="*{fechaIniActividad}" class="form-control"
-                                id="fechaIniActividad">
-                        </div>
+                            <div class="text-end">
+                                <a th:href="@{/actividad}" class="btn btn-outline-danger me-2">
+                                    <i class="fa-solid fa-left-long"></i> Volver
+                                </a>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Fecha Máxima</label>
-                            <input type="date" th:field="*{fechaMaxActividad}" class="form-control"
-                                id="fechaMaxActividad">
-                        </div>
+                                <button type="submit" class="btn btn-outline-success">
+                                    Guardar <i class="fa-regular fa-floppy-disk"></i>
+                                </button>
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label>Estado</label>
-                            <select th:field="*{estadoActividad}" class="form-select">
-                                <option value="">Seleccione</option>
-                                <option value="ABIERTO">ABIERTO</option>
-                                <option value="EN_PROCESO">EN PROCESO</option>
-                                <option value="CERRADO">CERRADO</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label>Acción</label>
-                            <select th:field="*{accion.codigoAccion}" class="form-select" id="accionId">
-                                <option value="">Seleccione acción</option>
-                                <option th:each="a : ${acciones}" th:value="${a.codigoAccion}"
-                                    th:text="'ID: ' + ${a.codigoAccion} + ' - ' + ${a.aspectoAmbientalAccion}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <input type="hidden" id="esEdicion" th:value="${actividad.codigoActividad != null}">
+                        </form>
 
                     </div>
-
-                    <div class="text-end">
-                        <a th:href="@{/actividad}" class="btn btn-outline-danger me-2">
-                            <i class="fa-solid fa-left-long"></i> Volver
-                        </a>
-
-                        <button type="submit" class="btn btn-outline-success">
-                            Guardar <i class="fa-regular fa-floppy-disk"></i>
-                        </button>
-                    </div>
-
-                </form>
-
+                </div>
             </div>
+
+            <div th:replace="layout/base :: footer"></div>
+
         </div>
+
     </div>
 
-    <div th:replace="layout/base :: footer"></div>
+    <style>
+        label.error {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+
+        input.error,
+        select.error {
+            border-color: #dc3545;
+        }
+
+        input.valid,
+        select.valid {
+            border-color: #198754;
+        }
+
+        .sugerencia-numero {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .sugerencia-numero i {
+            margin-right: 0.25rem;
+        }
+
+        .fecha-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 
     <script>
         $(function () {
-
-            function getFechaActual() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                return year + '-' + month + '-' + day;
-            }
 
             $.validator.addMethod("fechaNoAnteriorHoy", function (value, element) {
                 if ($('#esEdicion').val() === 'true') return true;
@@ -140,7 +142,7 @@
                 hoy.setHours(0, 0, 0, 0);
 
                 return fechaIngresada >= hoy;
-            }, "La fecha de inicio no puede ser anterior a hoy");
+            });
 
             $.validator.addMethod("fechaMaximaValida", function (value, element) {
                 const fechaInicio = $("#fechaIniActividad").val();
@@ -153,7 +155,7 @@
                 fechaIni.setHours(0, 0, 0, 0);
 
                 return fechaMax >= fechaIni;
-            }, "La fecha máxima debe ser igual o posterior a la fecha de inicio");
+            });
 
             $("#actividadForm").validate({
                 rules: {
@@ -179,40 +181,9 @@
                         required: true
                     }
                 },
-                messages: {
-                    numeroActividad: {
-                        required: "El número de actividad es obligatorio",
-                        digits: "Solo números",
-                        min: "El número debe ser mayor a 0"
-                    },
-                    fechaIniActividad: {
-                        required: "Seleccione la fecha de inicio",
-                        date: "Ingrese una fecha válida",
-                        fechaNoAnteriorHoy: "La fecha de inicio no puede ser anterior a hoy"
-                    },
-                    fechaMaxActividad: {
-                        required: "Seleccione la fecha máxima",
-                        date: "Ingrese una fecha válida",
-                        fechaMaximaValida: "La fecha máxima debe ser igual o posterior a la fecha de inicio"
-                    },
-                    estadoActividad: {
-                        required: "Seleccione el estado"
-                    },
-                    "accion.codigoAccion": {
-                        required: "Debe seleccionar una acción"
-                    }
-                },
                 errorClass: "error",
                 validClass: "valid",
                 errorElement: "label",
-                errorPlacement: function (error, element) {
-                    if (element.attr('id') === 'numeroActividad') {
-                        element.closest('.mb-3').find('.sugerencia-numero').remove();
-                        error.insertAfter(element);
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
                 onfocusout: function (element) {
                     $(element).valid();
                     if (element.id === 'fechaIniActividad') {
@@ -228,29 +199,6 @@
             $('#fechaIniActividad').on('change', function () {
                 $('#fechaMaxActividad').valid();
             });
-
-            function mostrarAdvertenciaFechas() {
-                const fechaIni = $('#fechaIniActividad').val();
-                const fechaMax = $('#fechaMaxActividad').val();
-
-                if (fechaIni && fechaMax) {
-                    const fechaIniDate = new Date(fechaIni + "T00:00:00");
-                    const fechaMaxDate = new Date(fechaMax + "T00:00:00");
-
-                    fechaIniDate.setHours(0, 0, 0, 0);
-                    fechaMaxDate.setHours(0, 0, 0, 0);
-
-                    if (fechaMaxDate < fechaIniDate) {
-                        if ($('#fechaMaxActividad').next('.fecha-error').length === 0) {
-                            $('#fechaMaxActividad').after('<div class="fecha-error"><i class="fa-solid fa-circle-exclamation"></i> La fecha máxima es menor a la fecha de inicio</div>');
-                        }
-                    } else {
-                        $('#fechaMaxActividad').next('.fecha-error').remove();
-                    }
-                }
-            }
-
-            $('#fechaIniActividad, #fechaMaxActividad').on('change', mostrarAdvertenciaFechas);
 
         });
     </script>

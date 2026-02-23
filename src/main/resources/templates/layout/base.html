@@ -16,69 +16,97 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+        }
+
+        .sidebar .nav-link {
+            color: #ffffff;
+            padding: 12px 20px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
-    <nav th:fragment="menu" class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" th:href="@{/}">
-                <i class="fa-solid fa-leaf"></i> TEVCOL Ambiental
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <div class="d-flex">
 
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/accion}">
-                            <i class="fa-solid fa-list-check"></i> Acciones
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/actividad}">
-                            <i class="fa-solid fa-tasks"></i> Actividades
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown" th:if="${#authorization.expression('isAuthenticated()')}">
-                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-user-circle"></i> <span
-                                th:text="${#authentication.name}">Usuario</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <form th:action="@{/auth/logout}" method="post" id="logoutForm">
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fa-solid fa-sign-out-alt"></i> Cerrar Sesión
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+        <nav th:fragment="menu" class="sidebar bg-success text-white p-3">
+            <h4 class="text-center fw-bold mb-4">
+                <i class="fa-solid fa-leaf"></i> TEVCOL
+            </h4>
+
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" th:href="@{/}">
+                        <i class="fa-solid fa-home me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link text-white" th:href="@{/accion}">
+                        <i class="fa-solid fa-list-check me-2"></i> Acciones
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link text-white" th:href="@{/actividad}">
+                        <i class="fa-solid fa-tasks me-2"></i> Actividades
+                    </a>
+                </li>
+            </ul>
+
+            <hr class="text-white">
+
+            <div th:if="${#authorization.expression('isAuthenticated()')}">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                        data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user-circle me-2"></i>
+                        <strong th:text="${#authentication.name}">Usuario</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fa-solid fa-sign-out-alt me-2"></i> Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container">
-        <div th:replace="${contenido}"></div>
+        <div class="content-wrapper p-4 w-100">
+            <div th:replace="${contenido}"></div>
+
+            <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm">
+                <div class="container text-center">
+                    <h6 class="mb-0"><b>Desarrollado por:</b> Eddy Lucero</h6>
+                    <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
+                </div>
+            </footer>
+        </div>
+
     </div>
-
-    <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm">
-        <div class="container text-center">
-            <h6 class="mb-0"><b>Desarrollado por:</b> Eddy Lucero</h6>
-            <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
-        </div>
-    </footer>
 
     <script th:inline="javascript">
         $(document).ready(function () {
-            // Verificar si existe el parámetro loginSuccess en la URL
             const urlParams = new URLSearchParams(window.location.search);
-
             if (urlParams.has('loginSuccess')) {
                 Swal.fire({
                     icon: 'success',
@@ -88,12 +116,12 @@
                     timer: 3000,
                     timerProgressBar: true
                 });
-                
                 const cleanUrl = window.location.origin + window.location.pathname;
                 window.history.replaceState({}, document.title, cleanUrl);
             }
         });
     </script>
+
 </body>
 
 </html>
