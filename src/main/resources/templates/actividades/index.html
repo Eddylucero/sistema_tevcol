@@ -33,7 +33,7 @@
 
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
+                            <th>Código Actividad</th>
                             <th>N° Actividad</th>
                             <th>Fecha Inicio</th>
                             <th>Fecha Máxima</th>
@@ -73,7 +73,7 @@
     <div th:replace="layout/base :: footer"></div>
 
     <script th:inline="javascript">
-        const eliminarActividadUrl = [[@{/ actividad / eliminar /}]];
+        const eliminarActividadUrl = [[@{/actividad/eliminar/}]];
 
         function eliminarActividad(id) {
             Swal.fire({

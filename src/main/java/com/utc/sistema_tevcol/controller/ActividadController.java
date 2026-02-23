@@ -31,8 +31,14 @@ public class ActividadController {
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
-        model.addAttribute("actividad", new ActividadAccion());
+        ActividadAccion nuevaActividad = new ActividadAccion();
+        // Sugerir el último número + 1
+        nuevaActividad.setNumeroActividad(actividadService.obtenerUltimoNumeroActividad());
+
+        model.addAttribute("actividad", nuevaActividad);
         model.addAttribute("acciones", accionService.listar());
+        model.addAttribute("ultimoNumero", actividadService.obtenerUltimoNumeroActividad() - 1); // Para mostrar el
+                                                                                                 // último registrado
         return "actividades/actividad";
     }
 
@@ -40,11 +46,7 @@ public class ActividadController {
     public String guardar(@ModelAttribute ActividadAccion actividad,
             RedirectAttributes ra) {
 
-        boolean esNuevo = actividadService
-                .listar()
-                .stream()
-                .noneMatch(a -> a.getCodigoActividad()
-                        .equals(actividad.getCodigoActividad()));
+        boolean esNuevo = (actividad.getCodigoActividad() == null);
 
         try {
             AccionPlanAmbiental accion = accionService
@@ -77,7 +79,6 @@ public class ActividadController {
 
         model.addAttribute("actividad", actividadService.buscarPorId(id));
         model.addAttribute("acciones", accionService.listar());
-
         return "actividades/actividad";
     }
 

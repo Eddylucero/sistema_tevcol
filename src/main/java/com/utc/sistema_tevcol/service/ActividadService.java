@@ -23,10 +23,7 @@ public class ActividadService {
 
     public ActividadAccion guardar(ActividadAccion actividad) {
 
-        if (actividad.getCodigoActividad() == null) {
-            throw new RuntimeException("Debe ingresar el código de la actividad");
-        }
-
+        // Validar fechas
         if (actividad.getFechaIniActividad() != null &&
                 actividad.getFechaMaxActividad() != null &&
                 actividad.getFechaMaxActividad().isBefore(actividad.getFechaIniActividad())) {
@@ -34,10 +31,34 @@ public class ActividadService {
             throw new RuntimeException("La fecha máxima no puede ser menor a la fecha inicial");
         }
 
+        // Validar acción
         if (actividad.getAccion() == null ||
                 actividad.getAccion().getCodigoAccion() == null) {
 
             throw new RuntimeException("Debe seleccionar una acción válida");
+        }
+
+        // Validar número de actividad duplicado
+        if (actividad.getNumeroActividad() != null) {
+            boolean existeNumero;
+
+            if (actividad.getCodigoActividad() == null) {
+                // Es una actividad nueva
+                existeNumero = actividadRepo.existsByNumeroActividad(actividad.getNumeroActividad());
+                if (existeNumero) {
+                    throw new RuntimeException("El número de actividad " + actividad.getNumeroActividad() +
+                            " ya existe. El último número registrado es: " + obtenerUltimoNumeroActividad());
+                }
+            } else {
+                // Es una edición
+                existeNumero = actividadRepo.existsByNumeroActividadAndCodigoActividadNot(
+                        actividad.getNumeroActividad(),
+                        actividad.getCodigoActividad());
+                if (existeNumero) {
+                    throw new RuntimeException("El número de actividad " + actividad.getNumeroActividad() +
+                            " ya está siendo usado por otra actividad");
+                }
+            }
         }
 
         AccionPlanAmbiental accion = accionRepo.findById(
@@ -64,5 +85,12 @@ public class ActividadService {
 
     public void eliminar(Long id) {
         actividadRepo.deleteById(id);
+    }
+
+    // Método para obtener el último número de actividad
+    public Integer obtenerUltimoNumeroActividad() {
+        return actividadRepo.findMaxNumeroActividad()
+                .map(max -> max + 1)
+                .orElse(1); // Si no hay actividades, empieza en 1
     }
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/base :: head('Recuperar Acceso')}"></head>
+
+<body class="bg-light d-flex align-items-center" style="height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4 card p-4 shadow-sm border-0">
+                <h4 class="text-center fw-bold text-success">Recuperar Acceso</h4>
+                <p class="small text-muted text-center">Enviaremos un enlace a tu correo.</p>
+
+                <form th:action="@{/auth/olvido}" method="post" id="olvidoForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Correo Electrónico</label>
+                        <input type="email" name="email" id="email" class="form-control"
+                            placeholder="Tu correo registrado">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Enviar enlace</button>
+                </form>
+                <a th:href="@{/auth/login}"
+                    class="d-block text-center mt-3 small text-decoration-none text-muted">Volver al login</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            // 1. VALIDACIÓN JQUERY
+            $("#olvidoForm").validate({
+                rules: {
+                    email: { required: true, email: true }
+                },
+                messages: {
+                    email: {
+                        required: "Por favor, ingresa tu correo",
+                        email: "Formato de correo no válido"
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'text-danger small'
+            });
+
+            // 2. TOASTS
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success')) {
+                Toast.fire({ icon: 'success', title: 'Correo enviado correctamente' });
+            }
+            if (urlParams.has('errorEmail')) {
+                Toast.fire({ icon: 'error', title: 'Correo no encontrado', text: 'El email no existe en nuestra base.' });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -2,6 +2,9 @@ package com.utc.sistema_tevcol.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -17,9 +20,11 @@ public class ActividadAccion {
     private Integer numeroActividad;
 
     @Column(name = "fecha_ini_actividad")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaIniActividad;
 
     @Column(name = "fecha_max_actividad")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaMaxActividad;
 
     @Column(name = "estado_actividad")
