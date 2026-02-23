@@ -36,11 +36,7 @@ public class AccionController {
     public String guardar(@ModelAttribute AccionPlanAmbiental accion,
                           RedirectAttributes ra) {
 
-        boolean esNuevo = accionService
-                .listar()
-                .stream()
-                .noneMatch(a -> a.getCodigoAccion()
-                        .equals(accion.getCodigoAccion()));
+        boolean esNuevo = accion.getCodigoAccion() == null; 
 
         try {
 

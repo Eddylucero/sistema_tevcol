@@ -2,6 +2,7 @@ package com.utc.sistema_tevcol.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.utc.sistema_tevcol.entity.AccionPlanAmbiental;
@@ -18,10 +19,6 @@ public class AccionService {
 
     public AccionPlanAmbiental guardar(AccionPlanAmbiental accion) {
 
-        if (accion.getCodigoAccion() == null) {
-            throw new RuntimeException("Debe ingresar el código de la acción");
-        }
-
         if (accion.getAspectoAmbientalAccion() == null ||
             accion.getAspectoAmbientalAccion().isEmpty()) {
 
@@ -33,6 +30,11 @@ public class AccionService {
 
     public List<AccionPlanAmbiental> listar() {
         return accionRepo.findAll();
+    }
+
+
+    public boolean existePorId(Long id) {
+        return accionRepo.existsById(id);
     }
 
     public AccionPlanAmbiental buscarPorId(Long id) {
