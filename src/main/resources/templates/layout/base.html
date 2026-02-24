@@ -21,6 +21,8 @@
         body {
             overflow-x: hidden;
             background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
 
         /* Sidebar styles */
@@ -34,10 +36,7 @@
             left: 0;
             top: 0;
             z-index: 1000;
-        }
-
-        .sidebar.collapsed {
-            margin-left: -260px;
+            overflow-y: auto;
         }
 
         .sidebar .nav-link {
@@ -72,19 +71,17 @@
             flex-grow: 1;
             background-color: #f8f9fa;
             transition: all 0.3s ease-in-out;
-            width: 100%;
+            width: calc(100% - 260px);
             margin-left: 260px;
-        }
-
-        .content-wrapper.expanded {
-            margin-left: 0;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .user-panel {
             background: rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             padding: 10px;
-            margin-top: 20px;
+            margin: 20px 10px;
         }
 
         /* Navbar móvil */
@@ -112,11 +109,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             transition: all 0.2s;
-        }
-
-        .mobile-navbar .menu-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
         }
 
         .mobile-navbar .brand {
@@ -127,13 +121,7 @@
             gap: 8px;
         }
 
-        .mobile-navbar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Overlay para móvil */
+        /* Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -144,112 +132,110 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transition: opacity 0.3s ease;
             pointer-events: none;
         }
 
         .sidebar-overlay.show {
+            display: block;
             opacity: 1;
             pointer-events: auto;
         }
 
-        /* Media queries para responsividad */
+        /* Botón cerrar sidebar */
+        .close-sidebar {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Media queries */
         @media (max-width: 768px) {
             .mobile-navbar {
                 display: flex;
             }
 
             .sidebar {
-                position: fixed;
                 left: -260px;
-                top: 0;
-                height: 100vh;
-                z-index: 1001;
             }
 
             .sidebar.show {
                 left: 0;
             }
 
+            .close-sidebar {
+                display: flex;
+            }
+
             .content-wrapper {
+                width: 100%;
                 margin-left: 0 !important;
                 padding: 15px !important;
             }
 
-            .sidebar-overlay.show {
-                display: block;
-            }
-
-            /* Ajustes para el contenido */
-            .container-fluid {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            /* Mejoras para tablas en móvil */
             .table-responsive {
-                border: 0;
-                margin-bottom: 1rem;
+                overflow-x: auto;
             }
 
-            /* Ajustes para cards */
-            .card {
-                margin-bottom: 1rem;
-            }
-        }
-
-        /* Para tablets */
-        @media (min-width: 769px) and (max-width: 992px) {
-            .content-wrapper {
-                margin-left: 260px;
+            .btn-group {
+                display: flex;
+                gap: 5px;
             }
         }
 
-        /* Animaciones */
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
+        /* Estilos para DataTables en móvil */
+        @media (max-width: 576px) {
+
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                text-align: left;
+                margin: 10px 0;
             }
 
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100% !important;
+                margin-left: 0 !important;
             }
 
-            to {
-                transform: translateX(-100%);
+            .dataTables_paginate {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
             }
         }
     </style>
 </head>
 
-<body class="bg-light">
-
-    <!-- Navbar para móviles -->
+<body>
+    <!-- Navbar móvil -->
     <div class="mobile-navbar">
-        <button class="menu-toggle" id="menuToggle" type="button">
+        <button class="menu-toggle" id="menuToggle">
             <i class="fa-solid fa-bars"></i>
         </button>
-
         <div class="brand">
             <i class="fa-solid fa-leaf"></i>
             <span>TEVCOL</span>
         </div>
-
-        <div th:if="${#authorization.expression('isAuthenticated()')}" class="user-info">
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
             <div class="dropdown">
-                <a href="#" class="text-white" data-bs-toggle="dropdown">
-                    <i class="fa-solid fa-circle-user fa-2x"></i>
+                <a href="#" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-circle-user fa-2x text-white"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-0">
+                <ul class="dropdown-menu dropdown-menu-dark">
                     <li>
-                        <form th:action="@{/auth/logout}" method="post" id="logoutFormMobile">
-                            <button type="submit" class="dropdown-item py-2">
+                        <form th:action="@{/auth/logout}" method="post">
+                            <button type="submit" class="dropdown-item">
                                 <i class="fa-solid fa-power-off me-2 text-danger"></i> Cerrar Sesión
                             </button>
                         </form>
@@ -259,168 +245,93 @@
         </div>
     </div>
 
-    <!-- Overlay para móviles -->
+    <!-- Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <nav th:fragment="menu" class="sidebar text-white p-2" id="sidebar">
-            <div class="p-3 mb-4">
-                <!-- Botón cerrar para móviles -->
-                <button class="d-md-none position-absolute top-0 end-0 mt-2 me-2 btn btn-sm text-white"
-                    id="closeSidebar" style="background: rgba(255,255,255,0.2);">
-                    <i class="fa-solid fa-times"></i>
-                </button>
-
-                <h4 class="text-center fw-bold mb-0">
-                    <i class="fa-solid fa-leaf me-2"></i>TEVCOL
-                </h4>
-                <p class="text-center small opacity-75 mb-0">Gestión Ambiental</p>
-            </div>
-
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li>
-                    <a class="nav-link" th:href="@{/accion}"
-                        th:classappend="${#execInfo.templateName.contains('accion') ? 'active' : ''}">
-                        <i class="fa-solid fa-list-check"></i> Acciones
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link" th:href="@{/actividad}"
-                        th:classappend="${#execInfo.templateName.contains('actividad') ? 'active' : ''}">
-                        <i class="fa-solid fa-tasks"></i> Actividades
-                    </a>
-                </li>
-            </ul>
-
-            <hr class="mx-3 opacity-25">
-
-            <!-- User panel para desktop -->
-            <div th:if="${#authorization.expression('isAuthenticated()')}" class="user-panel mx-2 d-none d-md-block">
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-2"
-                        data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-circle-user fa-2x me-2 text-info"></i>
-                        <div class="overflow-hidden">
-                            <p class="mb-0 small fw-bold text-truncate" th:text="${#authentication.name}">Usuario</p>
-                            <span class="badge bg-light text-dark" style="font-size: 0.6rem;">ADMIN</span>
-                        </div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0">
-                        <li>
-                            <form th:action="@{/auth/logout}" method="post" id="logoutForm">
-                                <button type="submit" class="dropdown-item py-2">
-                                    <i class="fa-solid fa-power-off me-2 text-danger"></i> Cerrar Sesión
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <div class="content-wrapper p-4" id="contentWrapper">
-            <div th:replace="${contenido}"></div>
-
-            <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm rounded-3">
-                <div class="container text-center text-muted">
-                    <h6 class="mb-0 small text-dark"><b>Desarrollado por:</b> Eddy Lucero</h6>
-                    <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
-                </div>
-            </footer>
+    <!-- Sidebar -->
+    <nav th:fragment="menu" class="sidebar text-white p-2" id="sidebar">
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <div class="p-3 mb-4">
+            <h4 class="text-center fw-bold">
+                <i class="fa-solid fa-leaf me-2"></i>TEVCOL
+            </h4>
         </div>
+        <ul class="nav nav-pills flex-column">
+            <li>
+                <a class="nav-link" th:href="@{/accion}"
+                    th:classappend="${#httpServletRequest.requestURI.contains('accion') ? 'active' : ''}">
+                    <i class="fa-solid fa-list-check"></i> Acciones
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" th:href="@{/actividad}"
+                    th:classappend="${#httpServletRequest.requestURI.contains('actividad') ? 'active' : ''}">
+                    <i class="fa-solid fa-tasks"></i> Actividades
+                </a>
+            </li>
+        </ul>
+        <hr class="mx-3 opacity-25">
+        <div th:if="${#authorization.expression('isAuthenticated()')}" class="user-panel">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-circle-user fa-2x me-2 text-info"></i>
+                <div>
+                    <p class="mb-0 small fw-bold" th:text="${#authentication.name}">Usuario</p>
+                    <span class="badge bg-light text-dark">ADMIN</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="content-wrapper" id="contentWrapper">
+        <div th:replace="${contenido}"></div>
+        <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top rounded-3">
+            <div class="text-center text-muted">
+                <small>Desarrollado por: Eddy Lucero | UTC - 2026</small>
+            </div>
+        </footer>
     </div>
 
-    <script th:inline="javascript">
-        $(document).ready(function () {
-            // Manejo del menú responsive
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('sidebar');
-            const contentWrapper = document.getElementById('contentWrapper');
-            const menuToggle = document.getElementById('menuToggle');
             const overlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
             const closeSidebar = document.getElementById('closeSidebar');
 
             function toggleSidebar(show) {
                 if (window.innerWidth <= 768) {
-                    if (show) {
-                        sidebar.classList.add('show');
-                        overlay.classList.add('show');
-                        document.body.style.overflow = 'hidden';
-                    } else {
-                        sidebar.classList.remove('show');
-                        overlay.classList.remove('show');
-                        document.body.style.overflow = '';
-                    }
+                    sidebar.classList.toggle('show', show);
+                    overlay.classList.toggle('show', show);
+                    document.body.style.overflow = show ? 'hidden' : '';
                 }
             }
 
-            // Event listeners para el menú móvil
             if (menuToggle) {
-                menuToggle.addEventListener('click', function () {
-                    toggleSidebar(true);
-                });
+                menuToggle.addEventListener('click', () => toggleSidebar(true));
             }
-
-            if (overlay) {
-                overlay.addEventListener('click', function () {
-                    toggleSidebar(false);
-                });
-            }
-
             if (closeSidebar) {
-                closeSidebar.addEventListener('click', function () {
-                    toggleSidebar(false);
-                });
+                closeSidebar.addEventListener('click', () => toggleSidebar(false));
+            }
+            if (overlay) {
+                overlay.addEventListener('click', () => toggleSidebar(false));
             }
 
-            // Cerrar sidebar al hacer click en un enlace (móvil)
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function () {
-                    if (window.innerWidth <= 768) {
-                        toggleSidebar(false);
-                    }
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) toggleSidebar(false);
                 });
             });
 
-            // Manejar cambio de tamaño de ventana
-            window.addEventListener('resize', function () {
+            window.addEventListener('resize', () => {
                 if (window.innerWidth > 768) {
-                    // Restaurar estado para desktop
                     sidebar.classList.remove('show');
                     overlay.classList.remove('show');
                     document.body.style.overflow = '';
                 }
             });
-
-            // URL params para mensajes de bienvenida
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('loginSuccess')) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Bienvenido al Sistema!',
-                    text: 'Sesión iniciada correctamente',
-                    confirmButtonColor: '#198754',
-                    timer: 2500,
-                    timerProgressBar: true
-                });
-                const cleanUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, cleanUrl);
-            }
-
-            // Cerrar sidebar con tecla ESC
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && window.innerWidth <= 768 && sidebar.classList.contains('show')) {
-                    toggleSidebar(false);
-                }
-            });
-
-            // Prevenir scroll del body cuando el sidebar está abierto en móvil
-            sidebar.addEventListener('touchmove', function (e) {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
-                    e.stopPropagation();
-                }
-            }, { passive: true });
         });
     </script>
 </body>
