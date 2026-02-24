@@ -4,48 +4,36 @@
 <head th:replace="layout/base :: head('Actividades')"></head>
 
 <body>
-    <div th:fragment="contenido">
-        <!-- Mensajes de éxito -->
-        <div th:if="${success}">
-            <script th:inline="javascript">
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: [[${ success }]],
-                    confirmButtonColor: '#198754'
-                });
-            </script>
-        </div>
 
-        <!-- Mensajes de error -->
-        <div th:if="${error}">
-            <script th:inline="javascript">
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: [[${ error }]],
-                    confirmButtonColor: '#dc3545'
-                });
-            </script>
-        </div>
+    <div class="d-flex">
 
-        <!-- Cabecera con título y botón nuevo -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">
-                <i class="fa-solid fa-tasks me-2 text-success"></i>
-                Listado de Actividades
-            </h2>
-            <a th:href="@{/actividad/nuevo}" class="btn btn-success">
-                <i class="fa-solid fa-plus me-2"></i>Nueva Actividad
-            </a>
-        </div>
+        <div th:replace="layout/base :: menu"></div>
 
-        <!-- Tabla de actividades -->
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="table-responsive">
+        <div class="content-wrapper p-4 w-100">
+
+            <div th:if="${success}">
+                <script th:inline="javascript">
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: [[${ success }]]
+                    });
+                </script>
+            </div>
+
+            <div class="mb-3 text-end">
+                <a th:href="@{/actividad/nuevo}" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-plus"></i> Nueva Actividad
+                </a>
+            </div>
+
+            <h2 class="text-center mb-4">Listado de Actividades</h2>
+
+            <div class="card shadow">
+                <div class="card-body">
                     <table id="tablaActividades" class="table table-bordered table-hover text-center align-middle">
-                        <thead class="table-success">
+
+                        <thead class="table-light">
                             <tr>
                                 <th>Código Actividad</th>
                                 <th>N° Actividad</th>
@@ -56,48 +44,40 @@
                                 <th>Opciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <tr th:each="a : ${actividades}" th:unless="${#lists.isEmpty(actividades)}">
+                            <tr th:each="a : ${actividades}">
                                 <td th:text="${a.codigoActividad}"></td>
                                 <td th:text="${a.numeroActividad}"></td>
                                 <td th:text="${a.fechaIniActividad}"></td>
                                 <td th:text="${a.fechaMaxActividad}"></td>
+                                <td th:text="${a.estadoActividad}"></td>
+                                <td th:text="${a.accion.codigoAccion}"></td>
                                 <td>
-                                    <span class="badge"
-                                        th:classappend="${a.estadoActividad == 'ACTIVO' ? 'bg-success' : 
-                                                                         a.estadoActividad == 'INACTIVO' ? 'bg-secondary' : 'bg-warning'}"
-                                        th:text="${a.estadoActividad}">ACTIVO</span>
-                                </td>
-                                <td th:text="${a.accion != null ? a.accion.codigoAccion : 'N/A'}">ACC-001</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a th:href="@{/actividad/editar/{id}(id=${a.codigoActividad})}"
-                                            class="btn btn-outline-warning btn-sm" title="Editar">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <button class="btn btn-outline-danger btn-sm"
-                                            th:onclick="'eliminarActividad(' + ${a.codigoActividad} + ')'"
-                                            title="Eliminar">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(actividades)}">
-                                <td colspan="7" class="text-center text-muted py-5">
-                                    <i class="fa-solid fa-folder-open fa-3x mb-3"></i><br>
-                                    No hay actividades registradas
+                                    <a th:href="@{/actividad/editar/{id}(id=${a.codigoActividad})}"
+                                        class="btn btn-outline-warning btn-sm">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <button class="btn btn-outline-danger btn-sm"
+                                        th:onclick="|eliminarActividad(${a.codigoActividad})|">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
+
                     </table>
                 </div>
             </div>
+
+            <div th:replace="layout/base :: footer"></div>
+
         </div>
+
     </div>
 
     <script th:inline="javascript">
-        /*<![CDATA[*/
         const eliminarActividadUrl = [[@{/actividad/eliminar/}]];
 
         function eliminarActividad(id) {
@@ -106,8 +86,6 @@
                 text: 'Esta acción no se puede deshacer',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
@@ -116,28 +94,18 @@
                 }
             });
         }
-
-        $(document).ready(function () {
-            try {
-                $('#tablaActividades').DataTable({
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
-                    },
-                    pageLength: 10,
-                    order: [[0, 'desc']],
-                    columnDefs: [
-                        { orderable: false, targets: [6] }
-                    ],
-                    responsive: true,
-                    autoWidth: false,
-                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
-                });
-            } catch (e) {
-                console.error('Error al inicializar DataTable:', e);
-            }
-        });
-        /*]]>*/
     </script>
+
+    <script th:inline="javascript">
+        $(function () {
+            $('#tablaActividades').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

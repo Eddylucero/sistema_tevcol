@@ -4,50 +4,36 @@
 <head th:replace="layout/base :: head('Acciones')"></head>
 
 <body>
-    <!-- Fragmento de contenido que se insertará en layout/base -->
-    <div th:fragment="contenido">
 
-        <!-- Mensajes de éxito -->
-        <div th:if="${success}">
-            <script th:inline="javascript">
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: [[${ success }]],
-                    confirmButtonColor: '#198754'
-                });
-            </script>
-        </div>
+    <div class="d-flex">
 
-        <!-- Mensajes de error -->
-        <div th:if="${error}">
-            <script th:inline="javascript">
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: [[${ error }]],
-                    confirmButtonColor: '#dc3545'
-                });
-            </script>
-        </div>
+        <div th:replace="layout/base :: menu"></div>
 
-        <!-- Cabecera con título y botón nueva acción (alineados correctamente) -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">
-                <i class="fa-solid fa-list-check me-2 text-success"></i>
-                Listado de Acciones
-            </h2>
-            <a th:href="@{/accion/nuevo}" class="btn btn-success">
-                <i class="fa-solid fa-plus me-2"></i>Nueva Acción
-            </a>
-        </div>
+        <div class="content-wrapper p-4 w-100">
 
-        <!-- Tabla de acciones -->
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="table-responsive">
+            <div th:if="${success}">
+                <script th:inline="javascript">
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: [[${ success }]]
+                    });
+                </script>
+            </div>
+
+            <div class="mb-3 text-end">
+                <a th:href="@{/accion/nuevo}" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-plus"></i> Nueva Acción
+                </a>
+            </div>
+
+            <h2 class="text-center mb-4">Listado de Acciones</h2>
+
+            <div class="card shadow">
+                <div class="card-body">
                     <table id="tablaAcciones" class="table table-bordered table-hover text-center align-middle">
-                        <thead class="table-success">
+
+                        <thead class="table-light">
                             <tr>
                                 <th>ID</th>
                                 <th>Aspecto Ambiental</th>
@@ -58,59 +44,50 @@
                                 <th>Opciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <tr th:each="a : ${acciones}" th:unless="${#lists.isEmpty(acciones)}">
-                                <td th:text="${a.codigoAccion}">1</td>
-                                <td th:text="${a.aspectoAmbientalAccion}">Aspecto ejemplo</td>
-                                <td th:text="${a.impactoAmbientalAccion}">Impacto ejemplo</td>
+                            <tr th:each="a : ${acciones}">
+                                <td th:text="${a.codigoAccion}"></td>
+                                <td th:text="${a.aspectoAmbientalAccion}"></td>
+                                <td th:text="${a.impactoAmbientalAccion}"></td>
                                 <td>
                                     <span th:if="${a.estadoAplica == 1}" class="badge bg-success">Activo</span>
                                     <span th:if="${a.estadoAplica == 0}" class="badge bg-danger">Inactivo</span>
                                 </td>
-                                <td th:text="${a.frecuenciaAccion}">Mensual</td>
-                                <td th:text="${a.periodoAccion}">2024</td>
+                                <td th:text="${a.frecuenciaAccion}"></td>
+                                <td th:text="${a.periodoAccion}"></td>
                                 <td>
-                                    <div class="btn-group" role="group">
-                                        <a th:href="@{/accion/editar/{id}(id=${a.codigoAccion})}"
-                                            class="btn btn-outline-warning btn-sm" title="Editar">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <button class="btn btn-outline-danger btn-sm"
-                                            th:onclick="'eliminarAccion(' + ${a.codigoAccion} + ')'" title="Eliminar">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Fila que se muestra si no hay datos -->
-                            <tr th:if="${#lists.isEmpty(acciones)}">
-                                <td colspan="7" class="text-center text-muted py-5">
-                                    <i class="fa-solid fa-folder-open fa-3x mb-3"></i><br>
-                                    No hay acciones registradas
+                                    <a th:href="@{/accion/editar/{id}(id=${a.codigoAccion})}"
+                                        class="btn btn-outline-warning btn-sm">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <button class="btn btn-outline-danger btn-sm"
+                                        th:onclick="|eliminarAccion(${a.codigoAccion})|">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
+
                     </table>
                 </div>
             </div>
+
+            <div th:replace="layout/base :: footer"></div>
+
         </div>
+
     </div>
 
-    <!-- Scripts específicos de la página -->
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        // URL base para eliminar (inyectada por Thymeleaf)
-        const eliminarAccionUrl = [[@{/ accion/eliminar/}]];
-
-        // Función para confirmar eliminación con SweetAlert2
+        const eliminarAccionUrl = [[@{/accion/eliminar/}]];
         function eliminarAccion(id) {
             Swal.fire({
                 title: '¿Eliminar acción?',
                 text: 'Esta acción no se puede deshacer',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
@@ -119,36 +96,18 @@
                 }
             });
         }
-
-        // Inicialización de DataTable cuando el DOM está listo
-        $(document).ready(function () {
-            try {
-                $('#tablaAcciones').DataTable({
-                    // Configuración de idioma (URL corregida con https://)
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
-                    },
-                    // Mostrar 10 registros por página por defecto
-                    pageLength: 10,
-                    // Ordenar por la primera columna (ID) de forma descendente
-                    order: [[0, 'desc']],
-                    // Deshabilitar ordenamiento en la columna de opciones
-                    columnDefs: [
-                        { orderable: false, targets: [6] }
-                    ],
-                    // Habilitar modo responsivo
-                    responsive: true,
-                    // Ancho automático
-                    autoWidth: false,
-                    // Opciones de cantidad de registros
-                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
-                });
-            } catch (e) {
-                console.error('Error al inicializar DataTable:', e);
-            }
-        });
-        /*]]>*/
     </script>
+
+    <script>
+        $(function () {
+            $('#tablaAcciones').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>
