@@ -39,7 +39,7 @@ public class EmailService {
         Map<String, Object> body = Map.of(
                 "sender", Map.of(
                         "name", "Sistema TEVCOL",
-                        "email", "a32ec9001@smtp-brevo.com"),
+                        "email", "sistemaseddy8@gmail.com"),
                 "to", List.of(
                         Map.of("email", destino)),
                 "subject", "Recuperación de contraseña - TEVCOL",
