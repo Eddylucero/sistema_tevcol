@@ -13,6 +13,10 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    // 👇 NUEVA LÍNEA - Inyecta la URL base
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -23,8 +27,8 @@ public class EmailService {
         message.setTo(to);
         message.setSubject("Recuperación de Contraseña - TEVCOL");
 
-        // Aquí defines la URL de tu sistema
-        String url = "http://localhost:8080/auth/restablecer?token=" + token;
+        // ✅ AHORA USA LA URL CORRECTA (Railway o local según el entorno)
+        String url = baseUrl + "/auth/restablecer?token=" + token;
 
         message.setText("Hola, has solicitado restablecer tu contraseña.\n\n" +
                 "Haz clic en el siguiente enlace para cambiarla:\n" + url +
