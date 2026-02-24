@@ -1,39 +1,48 @@
 package com.utc.sistema_tevcol.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
-    @Value("${spring.mail.username}")
-    private String fromEmail;
-
-    // 👇 NUEVA LÍNEA - Inyecta la URL base
     @Value("${app.base-url}")
     private String baseUrl;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    public void enviarCorreoRecuperacion(String destino, String token) {
 
-    public void enviarCorreoRecuperacion(String to, String token) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(to);
-        message.setSubject("Recuperación de Contraseña - TEVCOL");
+        RestTemplate restTemplate = new RestTemplate();
 
-        // ✅ AHORA USA LA URL CORRECTA (Railway o local según el entorno)
-        String url = baseUrl + "/auth/restablecer?token=" + token;
+        String url = "https://api.brevo.com/v3/smtp/email";
 
-        message.setText("Hola, has solicitado restablecer tu contraseña.\n\n" +
-                "Haz clic en el siguiente enlace para cambiarla:\n" + url +
-                "\n\nSi no fuiste tú, ignora este correo.");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("api-key", apiKey);
 
-        mailSender.send(message);
+        String enlace = baseUrl + "/auth/restablecer?token=" + token;
+
+        String body = """
+                {
+                  "sender": {
+                    "name": "Sistema TEVCOL",
+                    "email": "a32ec9001@smtp-brevo.com"
+                  },
+                  "to": [{
+                    "email": "%s"
+                  }],
+                  "subject": "Recuperación de contraseña - TEVCOL",
+                  "htmlContent": "<p>Hola, solicitaste restablecer tu contraseña.</p><p><a href='%s'>Haz clic aquí para cambiarla</a></p><p>Si no fuiste tú, ignora este correo.</p>"
+                }
+                """
+                .formatted(destino, enlace);
+
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+        restTemplate.postForEntity(url, request, String.class);
     }
 }
