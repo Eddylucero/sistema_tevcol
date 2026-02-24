@@ -1,168 +1,158 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:fragment="head(titulo)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${titulo + ' - Sistema TEVCOL'}">Sistema TEVCOL</title>
+    <title th:text="${titulo}">Sistema TEVCOL</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
-    <style th:fragment="estilos">
+    <style>
         body {
             overflow-x: hidden;
             background-color: #f8f9fa;
-        }
-
-        #wrapper {
-            display: flex;
-            width: 100%;
         }
 
         .sidebar {
             width: 260px;
             min-height: 100vh;
             background: linear-gradient(180deg, #198754 0%, #145a32 100%);
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
-            z-index: 1050;
-        }
-
-        /* Responsive Sidebar */
-        @media (max-width: 992px) {
-            .sidebar {
-                margin-left: -260px;
-                position: fixed;
-            }
-
-            .sidebar.active {
-                margin-left: 0;
-            }
-
-            .content-wrapper {
-                width: 100% !important;
-            }
         }
 
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
+            padding: 14px 20px;
             margin: 5px 10px;
             border-radius: 8px;
+            display: flex;
+            align-items: center;
             transition: all 0.2s;
         }
 
         .sidebar .nav-link:hover {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
         }
 
         .sidebar .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.25);
             color: #fff;
             font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .navbar-mobile {
-            display: none;
-            background: #198754;
-            z-index: 1040;
+        .sidebar .nav-link i {
+            font-size: 1.1rem;
+            width: 25px;
         }
 
-        @media (max-width: 992px) {
-            .navbar-mobile {
-                display: flex;
-            }
+        .content-wrapper {
+            flex-grow: 1;
+            background-color: #f8f9fa;
+        }
+
+        .user-panel {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-    <nav th:fragment="nav-mobile" class="navbar navbar-mobile text-white p-3 shadow-sm">
-        <button class="btn btn-success" id="sidebarCollapse">
-            <i class="fas fa-bars"></i>
-        </button>
-        <span class="fw-bold ms-3">SISTEMA TEVCOL</span>
-    </nav>
-
-    <nav th:fragment="menu" id="sidebar" class="sidebar text-white p-2">
-        <div class="p-3 mb-4 text-center">
-            <h4 class="fw-bold mb-0"><i class="fa-solid fa-leaf me-2"></i>TEVCOL</h4>
-            <p class="small opacity-75">Gestión Ambiental</p>
-        </div>
-
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/accion}"
-                    th:classappend="${#execInfo.templateName.contains('accion')} ? 'active' : ''">
-                    <i class="fa-solid fa-list-check me-2"></i> Acciones
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/actividad}"
-                    th:classappend="${#execInfo.templateName.contains('actividad')} ? 'active' : ''">
-                    <i class="fa-solid fa-tasks me-2"></i> Actividades
-                </a>
-            </li>
-        </ul>
-
-        <div sec:authorize="isAuthenticated()" class="mt-auto p-2 user-panel rounded bg-dark bg-opacity-10 mx-2 mb-3">
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                    data-bs-toggle="dropdown">
-                    <i class="fa-solid fa-circle-user fa-2x me-2 text-info"></i>
-                    <span class="text-truncate small fw-bold" sec:authentication="name">Usuario</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark shadow">
-                    <li>
-                        <form th:action="@{/auth/logout}" method="post">
-                            <button type="submit" class="dropdown-item text-danger">
-                                <i class="fa-solid fa-power-off me-2"></i> Salir
-                            </button>
-                        </form>
-                    </li>
-                </ul>
+    <div class="d-flex">
+        <nav th:fragment="menu" class="sidebar text-white p-2">
+            <div class="p-3 mb-4">
+                <h4 class="text-center fw-bold mb-0">
+                    <i class="fa-solid fa-leaf me-2"></i>TEVCOL
+                </h4>
+                <p class="text-center small opacity-75 mb-0">Gestión Ambiental</p>
             </div>
+
+            <ul class="nav nav-pills flex-column mb-auto">                
+                <li>
+                    <a class="nav-link" th:href="@{/accion}"
+                        th:classappend="${#execInfo.templateName.contains('accion') ? 'active' : ''}">
+                        <i class="fa-solid fa-list-check"></i> Acciones
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" th:href="@{/actividad}"
+                        th:classappend="${#execInfo.templateName.contains('actividad') ? 'active' : ''}">
+                        <i class="fa-solid fa-tasks"></i> Actividades
+                    </a>
+                </li>
+            </ul>
+
+            <hr class="mx-3 opacity-25">
+
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="user-panel mx-2">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-2"
+                        data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-circle-user fa-2x me-2 text-info"></i>
+                        <div class="overflow-hidden">
+                            <p class="mb-0 small fw-bold text-truncate" th:text="${#authentication.name}">Usuario</p>
+                            <span class="badge bg-light text-dark" style="font-size: 0.6rem;">ADMIN</span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0">
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post" id="logoutForm">
+                                <button type="submit" class="dropdown-item py-2">
+                                    <i class="fa-solid fa-power-off me-2 text-danger"></i> Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-wrapper p-4 w-100">
+            <div th:replace="${contenido}"></div>
+
+            <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm rounded-3">
+                <div class="container text-center text-muted">
+                    <h6 class="mb-0 small text-dark"><b>Desarrollado por:</b> Eddy Lucero</h6>
+                    <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
+                </div>
+            </footer>
         </div>
-    </nav>
+    </div>
 
-    <footer th:fragment="footer" class="bg-white py-3 mt-5 border-top shadow-sm rounded-3">
-        <div class="container text-center text-muted">
-            <p class="mb-0 small"><b>Desarrollado por:</b> Eddy y Diego</p>
-            <small>UTC - 2026 | Sistema de Gestión Ambiental</small>
-        </div>
-    </footer>
-
-    <th:block th:fragment="scripts-base">
-        <script th:inline="javascript">
-            $(document).ready(function () {
-                // Toggle Sidebar móvil
-                $('#sidebarCollapse').on('click', function () {
-                    $('#sidebar').toggleClass('active');
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('loginSuccess')) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Bienvenido al Sistema!',
+                    text: 'Sesión iniciada correctamente',
+                    confirmButtonColor: '#198754',
+                    timer: 2500,
+                    timerProgressBar: true
                 });
-
-                // Cerrar sidebar al hacer clic fuera en móviles
-                $(document).on('click', function (e) {
-                    if ($(window).width() <= 992) {
-                        if (!$(e.target).closest('#sidebar, #sidebarCollapse').length) {
-                            $('#sidebar').removeClass('active');
-                        }
-                    }
-                });
-            });
-        </script>
-    </th:block>
-
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        });
+    </script>
 </body>
 
 </html>
